@@ -38,4 +38,4 @@ func _update_motion(delta) :
 func _on_floor():
 	ray.force_raycast_update()
 	print(ray.is_colliding())
-	return ray.is_colliding() && root.is_on_floor()
+	return ray.is_colliding() || root.is_on_floor()
