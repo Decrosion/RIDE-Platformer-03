@@ -1,0 +1,228 @@
+[gd_scene load_steps=31 format=2]
+
+[ext_resource path="res://player_v2/player_controller.gd" type="Script" id=1]
+[ext_resource path="res://player_v2/player_state_machine.gd" type="Script" id=2]
+[ext_resource path="res://player/states/motion/on_ground/idle.gd" type="Script" id=3]
+[ext_resource path="res://player/states/motion/on_ground/move.gd" type="Script" id=4]
+[ext_resource path="res://player/states/motion/in_air/jump.gd" type="Script" id=5]
+[ext_resource path="res://player/states/combat/stagger.gd" type="Script" id=6]
+[ext_resource path="res://player/states/combat/attack.gd" type="Script" id=7]
+[ext_resource path="res://player/states/die.gd" type="Script" id=8]
+[ext_resource path="res://player/shadow.png" type="Texture" id=9]
+[ext_resource path="res://player/body.png" type="Texture" id=10]
+[ext_resource path="res://player/weapon/weapon_pivot.gd" type="Script" id=11]
+[ext_resource path="res://player/weapon/Sword.tscn" type="PackedScene" id=12]
+[ext_resource path="res://player/health/Health.tscn" type="PackedScene" id=13]
+[ext_resource path="res://player/bullet/bullet_spawner.gd" type="Script" id=14]
+[ext_resource path="res://fonts/SourceCodePro-Bold.ttf" type="DynamicFontData" id=15]
+[ext_resource path="res://player/states/debug/state-name-displayer.gd" type="Script" id=16]
+[ext_resource path="res://Sprites/slide-00.png" type="Texture" id=17]
+[ext_resource path="res://Sprites/idle-01.png" type="Texture" id=18]
+[ext_resource path="res://Sprites/attack-00.png" type="Texture" id=19]
+[ext_resource path="res://Sprites/Sprite_Run_00.png" type="Texture" id=20]
+[ext_resource path="res://Sprites/Sprite_Run_01.png" type="Texture" id=21]
+[ext_resource path="res://Sprites/Sprite_Run_02.png" type="Texture" id=22]
+[ext_resource path="res://Sprites/Sprite_Run_03.png" type="Texture" id=23]
+[ext_resource path="res://Sprites/Sprite_Run_04.png" type="Texture" id=24]
+[ext_resource path="res://Backgrounds/4. back-00.png" type="Texture" id=25]
+[ext_resource path="res://Backgrounds/3. mid 2-00.png" type="Texture" id=26]
+[ext_resource path="res://Backgrounds/2. mid-00.png" type="Texture" id=27]
+
+[sub_resource type="DynamicFont" id=1]
+
+size = 20
+use_mipmaps = true
+use_filter = true
+font_data = ExtResource( 15 )
+
+[sub_resource type="SpriteFrames" id=2]
+
+animations = [ {
+"frames": [ ExtResource( 17 ) ],
+"loop": true,
+"name": "slide",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 18 ) ],
+"loop": true,
+"name": "idle",
+"speed": 5.0
+}, {
+"frames": [  ],
+"loop": true,
+"name": "crouch",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 19 ) ],
+"loop": true,
+"name": "attack",
+"speed": 5.0
+}, {
+"frames": [ ExtResource( 20 ), ExtResource( 21 ), ExtResource( 22 ), ExtResource( 23 ), ExtResource( 24 ) ],
+"loop": true,
+"name": "run",
+"speed": 10.0
+}, {
+"frames": [ ExtResource( 20 ), ExtResource( 21 ), ExtResource( 22 ) ],
+"loop": true,
+"name": "jump",
+"speed": 5.0
+} ]
+
+[sub_resource type="RectangleShape2D" id=3]
+
+extents = Vector2( 10, 16.4046 )
+
+[node name="PlayerV2" type="KinematicBody2D"]
+position = Vector2( 628.826, 390.266 )
+collision_layer = 0
+script = ExtResource( 1 )
+__meta__ = {
+"_edit_horizontal_guides_": [  ]
+}
+
+[node name="StateMachine" type="Node" parent="."]
+editor/display_folded = true
+script = ExtResource( 2 )
+START_STATE = NodePath("Idle")
+
+[node name="Idle" type="Node" parent="StateMachine"]
+script = ExtResource( 3 )
+
+[node name="Move" type="Node" parent="StateMachine"]
+script = ExtResource( 4 )
+
+[node name="Jump" type="Node" parent="StateMachine"]
+script = ExtResource( 5 )
+
+[node name="Stagger" type="Node" parent="StateMachine"]
+script = ExtResource( 6 )
+
+[node name="Attack" type="Node" parent="StateMachine"]
+script = ExtResource( 7 )
+
+[node name="Die" type="Node" parent="StateMachine"]
+script = ExtResource( 8 )
+
+[node name="Shadow" type="Sprite" parent="."]
+visible = false
+self_modulate = Color( 1, 1, 1, 0.361098 )
+position = Vector2( 0, -4 )
+texture = ExtResource( 9 )
+
+[node name="BodyPivot" type="Position2D" parent="."]
+editor/display_folded = true
+visible = false
+
+[node name="Body" type="Sprite" parent="BodyPivot"]
+position = Vector2( 0, -58.8242 )
+texture = ExtResource( 10 )
+
+[node name="WeaponPivot" type="Position2D" parent="."]
+visible = false
+position = Vector2( 1.17401, -61.266 )
+script = ExtResource( 11 )
+
+[node name="Offset" type="Position2D" parent="WeaponPivot"]
+position = Vector2( 110, 0 )
+
+[node name="Sword" parent="WeaponPivot/Offset" instance=ExtResource( 12 )]
+
+[node name="CollisionPolygon2D" type="CollisionPolygon2D" parent="."]
+visible = false
+polygon = PoolVector2Array( -6.8407, 15.3907, -5.91864, -40.8557, 14.3669, -41.7777, 14.3669, 15.0833 )
+disabled = true
+
+[node name="Health" parent="." instance=ExtResource( 13 )]
+
+[node name="BulletSpawn" type="Node2D" parent="."]
+editor/display_folded = true
+visible = false
+position = Vector2( 1.17401, -61.266 )
+script = ExtResource( 14 )
+
+[node name="CooldownTimer" type="Timer" parent="BulletSpawn"]
+wait_time = 0.2
+one_shot = true
+
+[node name="StateNameDisplayer" type="Label" parent="."]
+editor/display_folded = true
+margin_left = -109.0
+margin_top = -172.0
+margin_right = 110.0
+margin_bottom = -138.0
+custom_fonts/font = SubResource( 1 )
+text = "Test"
+align = 1
+valign = 1
+uppercase = true
+script = ExtResource( 16 )
+
+[node name="AnimatedSprite" type="AnimatedSprite" parent="."]
+position = Vector2( 17.3405, -32 )
+frames = SubResource( 2 )
+animation = "idle"
+playing = true
+offset = Vector2( -8, 0 )
+
+[node name="Camera2D" type="Camera2D" parent="."]
+editor/display_folded = true
+position = Vector2( 144, 40 )
+offset = Vector2( -96, -64 )
+current = true
+zoom = Vector2( 0.5, 0.5 )
+limit_left = 0
+limit_top = -960
+limit_right = 5400
+limit_bottom = 960
+limit_smoothed = true
+drag_margin_h_enabled = false
+drag_margin_v_enabled = false
+smoothing_enabled = true
+drag_margin_left = 0.0
+drag_margin_top = 0.0
+drag_margin_right = 0.4
+drag_margin_bottom = 0.4
+editor_draw_limits = true
+editor_draw_drag_margin = true
+
+[node name="ParallaxBackground" type="ParallaxBackground" parent="Camera2D"]
+
+[node name="Layer 3" type="ParallaxLayer" parent="Camera2D/ParallaxBackground"]
+position = Vector2( -240, -135 )
+motion_scale = Vector2( 0.01, 0 )
+motion_mirroring = Vector2( 480, 270 )
+
+[node name="Jungle Sky Background" type="Sprite" parent="Camera2D/ParallaxBackground/Layer 3"]
+texture = ExtResource( 25 )
+centered = false
+
+[node name="Layer 2" type="ParallaxLayer" parent="Camera2D/ParallaxBackground"]
+position = Vector2( -240, -135 )
+motion_scale = Vector2( 0.03, 0.03 )
+motion_mirroring = Vector2( 960, 540 )
+
+[node name="Jungle Mid 2" type="Sprite" parent="Camera2D/ParallaxBackground/Layer 2"]
+texture = ExtResource( 26 )
+centered = false
+
+[node name="Layer 1" type="ParallaxLayer" parent="Camera2D/ParallaxBackground"]
+position = Vector2( -240, -135 )
+motion_scale = Vector2( 0.2, 0.2 )
+motion_mirroring = Vector2( 960, 540 )
+
+[node name="Jungle Mid 1" type="Sprite" parent="Camera2D/ParallaxBackground/Layer 1"]
+texture = ExtResource( 27 )
+centered = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2( 10.2573, -24.5338 )
+shape = SubResource( 3 )
+
+[node name="RayCast2D" type="RayCast2D" parent="."]
+position = Vector2( 10.0073, -24.5338 )
+enabled = true
+cast_to = Vector2( 0, 38 )
+
+[connection signal="state_changed" from="StateMachine" to="WeaponPivot/Offset/Sword" method="_on_StateMachine_state_changed"]
+[connection signal="attack_finished" from="WeaponPivot/Offset/Sword" to="StateMachine/Attack" method="_on_Sword_attack_finished"]
